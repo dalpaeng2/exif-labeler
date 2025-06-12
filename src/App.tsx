@@ -280,6 +280,15 @@ function App() {
                     typeof exifData[tag] !== 'object' ||
                     Array.isArray(exifData[tag])
                 )
+                .filter((tag) =>
+                  [
+                    'Make',
+                    'Model',
+                    'ExposureTime',
+                    'FNumber',
+                    'ISOSpeedRatings',
+                  ].includes(tag)
+                )
                 .map((tag) => (
                   <div key={tag} className="checkbox-item">
                     <input
