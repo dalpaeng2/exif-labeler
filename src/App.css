@@ -80,6 +80,15 @@ button {
   background-color: #d6dbdf;
 }
 
+.reset-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.reset-btn:hover {
+  background-color: #c0392b;
+}
+
 .download-btn {
   background-color: #2ecc71;
   color: white;
@@ -193,7 +202,8 @@ button {
   }
 
   .upload-btn,
-  .settings-btn {
+  .settings-btn,
+  .reset-btn {
     width: 100%;
     max-width: 300px;
   }

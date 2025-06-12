@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import './App.css';
 import ExifReader from 'exifreader';
 import { saveAs } from 'file-saver';
-import { FaUpload, FaDownload, FaCog, FaImage } from 'react-icons/fa';
+import { FaUpload, FaDownload, FaCog, FaImage, FaTrash } from 'react-icons/fa';
 
 interface ExifData {
   Make?: string;
@@ -34,6 +34,25 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 초기화 함수 - 모든 상태를 초기 상태로 돌려놓습니다
+  const handleReset = () => {
+    setSelectedImage(null);
+    setExifData(null);
+    setProcessedImage(null);
+    setSelectedExifTags({
+      Make: true,
+      Model: true,
+      ExposureTime: true,
+      FNumber: true,
+      ISOSpeedRatings: true,
+      ISO: true,
+    });
+    // 파일 입력값도 초기화
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   // 이미지 파일 선택 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -282,6 +301,12 @@ function App() {
           >
             <FaCog /> EXIF 설정
           </button>
+
+          {selectedImage && (
+            <button className="reset-btn" onClick={handleReset}>
+              <FaTrash /> 초기화
+            </button>
+          )}
         </div>
 
         {showSettings && exifData && (
