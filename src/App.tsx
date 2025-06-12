@@ -6,14 +6,10 @@ import { FaUpload, FaDownload, FaCog, FaImage } from 'react-icons/fa';
 
 interface ExifData {
   Make?: string;
-  Model?: string;
-  DateTime?: string;
+  Model?: string; // 모든 태그를 표시하되, 객체나 배열이 아닌 값만 표시ime?: string;
   ExposureTime?: string;
   FNumber?: string;
   ISOSpeedRatings?: string;
-  FocalLength?: string;
-  GPSLatitude?: number[];
-  GPSLongitude?: number[];
   [key: string]: any;
 }
 
@@ -26,14 +22,14 @@ function App() {
   }>({
     Make: true,
     Model: true,
-    DateTime: true,
-    DateTimeOriginal: true,
+    // DateTime: true,
+    // DateTimeOriginal: true,
     ExposureTime: true,
     FNumber: true,
     ISOSpeedRatings: true,
     ISO: true,
-    FocalLength: true,
-    FocalLengthIn35mmFilm: true,
+    // FocalLength: true,
+    // FocalLengthIn35mmFilm: true,
   });
   const [showSettings, setShowSettings] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -72,6 +68,31 @@ function App() {
           });
 
           setExifData(exifData);
+
+          // 새로운 EXIF 태그를 체크박스 상태에 추가
+          const newTags = Object.keys(exifData).reduce((acc, tag) => {
+            acc[tag] =
+              selectedExifTags[tag] !== undefined
+                ? selectedExifTags[tag]
+                : false;
+            return acc;
+          }, {} as { [key: string]: boolean });
+
+          // 기본적으로 중요한 태그들은 선택
+          const importantTags = [
+            'Make',
+            'Model',
+            'ExposureTime',
+            'FNumber',
+            'ISOSpeedRatings',
+          ];
+          importantTags.forEach((tag) => {
+            if (exifData[tag]) {
+              newTags[tag] = true;
+            }
+          });
+
+          setSelectedExifTags(newTags);
           console.log('EXIF 데이터:', exifData);
         } catch (error) {
           console.error('EXIF 데이터를 읽는 중 오류 발생:', error);
@@ -117,18 +138,10 @@ function App() {
       // 폰트 크기에 비례하여 레터박스 높이 계산
       const lineHeight = Math.round(contentFontSize * 1.5); // 한 줄의 높이
 
-      // 먼저 필요한 EXIF 태그만 추출하고 포맷팅
-      const requiredTags = [
-        'Make',
-        'Model',
-        'ExposureTime',
-        'FNumber',
-        'ISOSpeedRatings',
-      ];
-      const filteredValues = requiredTags
+      // 사용자가 선택한 EXIF 태그만 추출하고 포맷팅
+      const filteredValues = Object.keys(selectedExifTags)
+        .filter((tag) => selectedExifTags[tag] && exifData[tag])
         .map((tag) => {
-          if (!exifData[tag]) return null;
-
           let displayValue = exifData[tag];
           if (tag === 'ExposureTime') {
             displayValue = `${displayValue}s`;
@@ -142,8 +155,9 @@ function App() {
         })
         .filter(Boolean);
 
-      // 값들을 ' | '로 결합
-      const exifText = filteredValues.join(' | ');
+      // 값들을 ' | '로 결합 (필터링된 값이 있는 경우에만)
+      const exifText =
+        filteredValues.length > 0 ? filteredValues.join(' | ') : '';
 
       // 텍스트 길이에 따라 한 줄 또는 두 줄로 분리
       ctx.font = `${contentFontSize}px Arial`;
